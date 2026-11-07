@@ -83,18 +83,28 @@ Una vez instaladas las dependencias y descargado el modelo de spaCy:
 
 La notebook carga los conjuntos de datos desde la carpeta `data/`, realiza el preprocesamiento de los textos y desarrolla las distintas etapas de clasificación y evaluación.
 
+
 ## 6. Metodología
 
 El desarrollo se organizó en las siguientes etapas:
 
 1. **Exploración de los datos:** inspección de dimensiones, columnas, distribución de categorías y características generales del corpus.
-2. **Preprocesamiento:** normalización y limpieza de textos, tratamiento de entidades HTML, lematización y eliminación de stop-words mediante spaCy.
-3. **Representación TF-IDF:** transformación de los textos procesados en matrices numéricas.
-4. **Entrenamiento:** implementación del clasificador LinearSVC.
-5. **Experimentación:** evaluación de tres configuraciones de TF-IDF, modificando el número máximo de características y el rango de n-gramas.
-6. **Evaluación:** comparación de los modelos mediante accuracy, precision, recall, F1-score y matrices de confusión.
 
-Para evitar la filtración de información (*data leakage*), los vectorizadores se ajustaron exclusivamente con los datos de entrenamiento y luego se aplicaron al conjunto de prueba.
+2. **Preprocesamiento:** normalización y limpieza de textos, tratamiento de entidades HTML, lematización y eliminación de stop-words mediante spaCy.
+
+3. **Representación TF-IDF:** transformación de los textos procesados en matrices numéricas. Se utilizó TF-IDF (*Term Frequency–Inverse Document Frequency*) para representar la importancia relativa de los términos en cada documento, considerando tanto su frecuencia en el texto como su distribución en el corpus.
+
+4. **Selección del clasificador:** se utilizó LinearSVC (Support Vector Classifier), un clasificador lineal basado en máquinas de soporte vectorial. Esta elección resulta adecuada para tareas de clasificación de textos, ya que permite trabajar eficientemente con representaciones TF-IDF, caracterizadas por tener una elevada dimensionalidad y una estructura dispersa (*sparse*).
+
+5. **Experimentación con TF-IDF:** se evaluaron tres configuraciones, modificando dos parámetros del vectorizador:
+
+   - `max_features`: establece el número máximo de características (términos) consideradas en la representación. Se compararon valores de 5.000 y 10.000 para analizar el efecto del tamaño del vocabulario sobre el desempeño del clasificador.
+   - `ngram_range`: define la longitud de las secuencias de términos consideradas. Se probaron `(1,1)`, que utiliza unigramas (palabras individuales), y `(1,2)`, que incorpora unigramas y bigramas (pares de palabras consecutivas). La inclusión de bigramas permite capturar información contextual que puede perderse al considerar únicamente palabras individuales.
+
+6. **Evaluación:** se compararon las configuraciones mediante accuracy, precision, recall, F1-score y matrices de confusión. Se seleccionó la configuración con mejor desempeño general entre las evaluadas.
+
+Para evitar la filtración de información (*data leakage*), cada vectorizador se ajustó exclusivamente con los datos de entrenamiento (`fit_transform`) y luego se aplicó al conjunto de prueba (`transform`).
+
 
 ## 7. Resultados principales
 
